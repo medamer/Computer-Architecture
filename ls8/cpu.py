@@ -2,33 +2,41 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.reg = [0] * 8
+        self.ram = [0] * 256
+        self.reg[7] = 0xF4
+        self.pc = 0
+        self.halted = False
 
-    def load(self):
+    def ram_read(self, address):
+        return self.ram[address]
+
+    def ram_write(self, address, val):
+        self.ram[address] = val
+
+    def load(self, filename):
         """Load a program into memory."""
-
         address = 0
+        
+        with open(filename) as f:
+            for line in f:
+                line_split = line.split('#')
+                val = line_split[0].strip()
+                if val == '':
+                    continue
 
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+                val = int(val, 2)
+                self.ram_write(address, val)
+                address +=1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -62,4 +70,18 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while not self.halted:
+            instruction = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+            if instruction == HLT:
+                self.halted = True
+                self.pc += 1
+            elif instruction == LDI:
+                self.reg[operand_a] = operand_b
+                self.pc += 3
+            elif instruction == PRN:
+                print(bin(self.reg[operand_a]))
+                self.pc += 2
+            else:
+                print("Invalid instruction")
