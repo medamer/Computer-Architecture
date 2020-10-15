@@ -5,6 +5,9 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+PUSH = 0b01000101
+POP = 0b01000110
+SP = 7
 
 class CPU:
     """Main CPU class."""
@@ -81,7 +84,17 @@ class CPU:
                 self.reg[operand_a] = operand_b
                 self.pc += 3
             elif instruction == PRN:
-                print(bin(self.reg[operand_a]))
+                print(self.reg[operand_a])
+                self.pc += 2
+            elif instruction == PUSH:
+                self.reg[SP] -= 1
+                get_val = self.reg[operand_a]
+                self.ram_write(self.reg[SP], get_val)
+                self.pc +=2
+            elif instruction == POP:
+                top_val = self.ram_read(self.reg[SP])
+                self.reg[operand_a] = top_val
+                self.reg[SP] +=1
                 self.pc += 2
             else:
                 print("Invalid instruction")
