@@ -7,6 +7,12 @@ LDI = 0b10000010
 PRN = 0b01000111
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
+MUL = 0b10100010
+ADD = 0b10100000
+DIV = 0b10100011
+SUB = 0b10100001
 SP = 7
 
 class CPU:
@@ -47,7 +53,15 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "DIV":
+            if self.reg[reg_b] != 0:
+                self.reg[reg_a] /= self.reg[reg_b]
+            else:
+                raise Exception("Cannot divide by 0")
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -96,5 +110,22 @@ class CPU:
                 self.reg[operand_a] = top_val
                 self.reg[SP] +=1
                 self.pc += 2
+            elif instruction == CALL:
+                value = self.pc + 2
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], value)
+                self.pc = self.reg[operand_a]
+            elif instruction == RET:
+                self.pc = self.ram_read(self.reg[SP])
+                self.reg[SP] += 1
+            elif instruction == ADD:
+                self.reg[operand_a] += self.reg[operand_b]
+                self.pc += 3
+            elif instruction == MUL:
+                self.reg[operand_a] *= self.reg[operand_b]
+                self.pc += 3
             else:
                 print("Invalid instruction")
+
+
+
