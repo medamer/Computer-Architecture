@@ -24,7 +24,7 @@ Run through the UPER problem solving framework while going through your thought 
 arr = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 # Use for loop to print the elements:
-# arr2 = reversed(arr)
+
 arr.reverse()
 for i in arr:
     print(i)
