@@ -10,6 +10,7 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 
+
 cpu = CPU()
 
 cpu.load(sys.argv[1])
